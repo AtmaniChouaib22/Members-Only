@@ -4,6 +4,9 @@ const morgan = require("morgan");
 const mongoose = require("mongoose");
 const MongoStore = require("connect-mongo");
 const session = require("express-session");
+const passport = require("passport");
+const router = require("./Routes/router");
+require("./config/passport");
 
 const PORT = process.env.PORT || 3000;
 const MONGO_URI = process.env.MONGO_URI;
@@ -43,9 +46,10 @@ app.use(
   })
 );
 
-app.get("/", (req, res) => {
-  console.log(req.session);
-  res.send("Hello World");
-});
+//passport authentication and session middleware
+app.use(passport.initialize());
+app.use(passport.session());
+
+app.use(router);
 
 connectDB();
