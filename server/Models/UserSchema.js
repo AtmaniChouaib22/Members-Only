@@ -11,7 +11,7 @@ const UserSchema = new Schema(
     admin: { type: Boolean, default: false },
     member: { type: Boolean, default: false },
   },
-  { timestamps: true }
+  { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
 );
 
 UserSchema.virtual("fullName").get(function () {
