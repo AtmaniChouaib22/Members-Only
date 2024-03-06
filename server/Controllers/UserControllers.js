@@ -17,7 +17,7 @@ const register_user = async (req, res, next) => {
     const { salt, hash } = genPassword(password);
     const newUser = new User({ first_name, last_name, email, salt, hash, admin, member: true });
     newUser
-      .save(newUser)
+      .save()
       .then((newUser) => {
         res.status(201).json(newUser);
       })
@@ -31,7 +31,7 @@ const register_user = async (req, res, next) => {
     const newUser = new User({ first_name, last_name, email, salt, hash, admin: false, member: false });
 
     newUser
-      .save(newUser)
+      .save()
       .then((newUser) => {
         res.status(201).json(newUser);
       })

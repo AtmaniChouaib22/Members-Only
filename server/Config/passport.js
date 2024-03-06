@@ -1,7 +1,7 @@
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
 const User = require("../Models/UserSchema");
-const { genPassword, validatePassword } = require("../Utils/passwordUtils");
+const { validatePassword } = require("../Utils/passwordUtils");
 
 const customFields = {
   usernameField: "email",
@@ -14,7 +14,7 @@ function verifyCallback(email, password, done) {
       if (!user) {
         return done(null, false);
       }
-      const isValid = user.validatePassword(password, user.hash, user.salt);
+      const isValid = validatePassword(password, user.hash, user.salt);
       if (isValid) {
         return done(null, user);
       } else {
