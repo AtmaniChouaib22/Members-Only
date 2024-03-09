@@ -6,6 +6,7 @@ const MongoStore = require("connect-mongo");
 const session = require("express-session");
 const passport = require("passport");
 const router = require("./Routes/router");
+const cors = require("cors");
 require("./config/passport");
 
 const PORT = process.env.PORT || 3000;
@@ -33,6 +34,7 @@ const app = express();
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cors());
 
 app.use(
   session({
