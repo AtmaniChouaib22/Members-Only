@@ -1,6 +1,6 @@
 const isAuth = (req, res, next) => {
   if (req.isAuthenticated()) {
-    console.log("user is authenticated");
+    console.log("user is authenticated from middleware");
     next();
   } else {
     res.status(401).json({ err: "you are unauthorized to visit this" });
