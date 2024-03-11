@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -10,10 +9,13 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
+import { appContext } from "@/App";
 
 const Navbar = () => {
+  const { isLogged, setIsLogged, isMember, setIsMember, isAdmin, setIsAdmin } =
+    useContext(appContext);
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [registerData, setRegisterData] = useState({
     email: "",
@@ -56,6 +58,12 @@ const Navbar = () => {
     })
       .then((res) => res.json())
       .then((data) => {
+        console.log("login data", data);
+        setIsLogged(true);
+        console.log("isLogged", isLogged);
+        const { admin } = data;
+        setIsAdmin(admin);
+        console.log("admin", admin);
         navigate("/dashboard");
       })
       .catch((err) => {
@@ -97,6 +105,7 @@ const Navbar = () => {
       .then((res) => res.json())
       .then((data) => {
         console.log(data);
+        setIsMember(true);
       })
       .catch((err) => {
         console.log(err);
@@ -115,7 +124,11 @@ const Navbar = () => {
     })
       .then((res) => res.json())
       .then(() => {
+        console.log(isLogged);
         console.log("success logout");
+        setIsLogged(false);
+        console.log(isLogged);
+        navigate("/");
       })
       .catch((err) => {
         console.log(err);
@@ -124,153 +137,165 @@ const Navbar = () => {
 
   return (
     <nav>
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button variant="outline">Login</Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Login</DialogTitle>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="email" className="text-right">
-                Email
-              </Label>
-              <Input
-                id="email"
-                value={loginData.email}
-                className="col-span-3"
-                onChange={handleInputChange}
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="password" className="text-right">
-                Password
-              </Label>
-              <Input
-                id="password"
-                value={loginData.password}
-                className="col-span-3"
-                onChange={handleInputChange}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button type="submit" onClick={handleLoginSubmit}>
-              Login
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {!isLogged && (
+        <>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline">Login</Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Login</DialogTitle>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="email" className="text-right">
+                    Email
+                  </Label>
+                  <Input
+                    id="email"
+                    value={loginData.email}
+                    className="col-span-3"
+                    onChange={handleInputChange}
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="password" className="text-right">
+                    Password
+                  </Label>
+                  <Input
+                    id="password"
+                    value={loginData.password}
+                    className="col-span-3"
+                    onChange={handleInputChange}
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button type="submit" onClick={handleLoginSubmit}>
+                  Login
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
 
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button variant="outline">Register</Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Register</DialogTitle>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="email" className="text-right">
-                First Name
-              </Label>
-              <Input
-                id="first_name"
-                value={registerData.first_name}
-                className="col-span-3"
-                onChange={handleRegistInputChange}
-                name="first_name"
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="last_name" className="text-right">
-                Last name
-              </Label>
-              <Input
-                id="last_name"
-                value={registerData.last_name}
-                className="col-span-3"
-                onChange={handleRegistInputChange}
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="email" className="text-right">
-                Email
-              </Label>
-              <Input
-                id="email"
-                value={registerData.email}
-                className="col-span-3"
-                onChange={handleRegistInputChange}
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="password" className="text-right">
-                Password
-              </Label>
-              <Input
-                id="password"
-                value={registerData.password}
-                className="col-span-3"
-                onChange={handleRegistInputChange}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button type="submit" onClick={handleRegisterSubmit}>
-              Register
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline">Register</Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Register</DialogTitle>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="email" className="text-right">
+                    First Name
+                  </Label>
+                  <Input
+                    id="first_name"
+                    value={registerData.first_name}
+                    className="col-span-3"
+                    onChange={handleRegistInputChange}
+                    name="first_name"
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="last_name" className="text-right">
+                    Last name
+                  </Label>
+                  <Input
+                    id="last_name"
+                    value={registerData.last_name}
+                    className="col-span-3"
+                    onChange={handleRegistInputChange}
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="email" className="text-right">
+                    Email
+                  </Label>
+                  <Input
+                    id="email"
+                    value={registerData.email}
+                    className="col-span-3"
+                    onChange={handleRegistInputChange}
+                  />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="password" className="text-right">
+                    Password
+                  </Label>
+                  <Input
+                    id="password"
+                    value={registerData.password}
+                    className="col-span-3"
+                    onChange={handleRegistInputChange}
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button type="submit" onClick={handleRegisterSubmit}>
+                  Register
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </>
+      )}
 
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button variant="outline">join Club</Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Join Club</DialogTitle>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="secret_pass" className="text-right">
-                Secret Pass
-              </Label>
-              <Input
-                id="secret_pass"
-                value={secret_pass}
-                className="col-span-3"
-                onChange={handleSecretPassChange}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button type="submit" onClick={handleSecretPassSubmit}>
-              Login
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {isLogged && !isAdmin && !isMember && (
+        <>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline">join Club</Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Join Club</DialogTitle>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="secret_pass" className="text-right">
+                    Secret Pass
+                  </Label>
+                  <Input
+                    id="secret_pass"
+                    value={secret_pass}
+                    className="col-span-3"
+                    onChange={handleSecretPassChange}
+                  />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button type="submit" onClick={handleSecretPassSubmit}>
+                  Login
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </>
+      )}
 
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button variant="outline">Logout</Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Logout</DialogTitle>
-          </DialogHeader>
-          <DialogFooter>
-            <Button type="submit" onClick={handleLogoutSubmit}>
-              Logout
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {isLogged && (
+        <>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant="outline">Logout</Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Logout</DialogTitle>
+              </DialogHeader>
+              <DialogFooter>
+                <Button type="submit" onClick={handleLogoutSubmit}>
+                  Logout
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </>
+      )}
     </nav>
   );
 };
