@@ -1,4 +1,3 @@
-import Navbar from "@/components/custom/Navbar";
 import Card from "@/components/custom/Card";
 import { useState, useEffect } from "react";
 
@@ -12,7 +11,6 @@ const Home = () => {
   console.log(messages);
   return (
     <div>
-      <Navbar />
       <div>
         {messages.map((message) => (
           <Card
