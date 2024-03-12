@@ -1,14 +1,27 @@
-const Card = ({ message, fullName, createdAt, admin, member, id }) => {
+import { Badge } from "@/components/ui/badge";
+
+const Card = ({ message, fullName, id, createdAt, admin, user }) => {
   return (
-    <div key={id}>
+    <div
+      key={id}
+      className="flex flex-col gap-1 border-2 border-slate-950 rounded-md py-1 pl-2"
+    >
       <div>{message}</div>
-      {member === true || admin === true ? (
-        <div>
-          <span>By {fullName}</span>
-          <span>on {createdAt}</span>
+      {user.member === true || user.admin === true ? (
+        <div className="flex gap-2">
+          <div>
+            By <span className="font-bold pr-1">{fullName}</span>
+            {admin && <Badge>Admin</Badge>}
+          </div>
+          <div>
+            on <span>{createdAt}</span>
+          </div>
         </div>
       ) : (
-        <div>Join the club to view this</div>
+        <>
+          <hr />
+          <div>Join the club to view this</div>
+        </>
       )}
     </div>
   );
