@@ -11,12 +11,20 @@ export const appContext = createContext({
   setIsMember: (isMember: boolean) => {},
   isAdmin: false,
   setIsAdmin: (isAdmin: boolean) => {},
+  user: {},
+  setUser: (user: object) => {},
 });
 
 function App() {
   const [isLogged, setIsLogged] = useState(false);
   const [isMember, setIsMember] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [user, setUser] = useState({
+    fullName: "",
+    admin: false,
+    member: false,
+    email: "",
+  });
   return (
     <appContext.Provider
       value={{
@@ -26,6 +34,8 @@ function App() {
         setIsMember,
         isAdmin,
         setIsAdmin,
+        user,
+        setUser,
       }}
     >
       <BrowserRouter>
