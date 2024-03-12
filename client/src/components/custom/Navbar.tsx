@@ -7,6 +7,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Menubar,
+  MenubarContent,
+  MenubarItem,
+  MenubarMenu,
+  MenubarSeparator,
+  MenubarTrigger,
+} from "@/components/ui/menubar";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState, useContext } from "react";
@@ -14,8 +22,7 @@ import { useNavigate } from "react-router-dom";
 import { appContext } from "@/App";
 
 const Navbar = () => {
-  const { isLogged, setIsLogged, isMember, setIsMember, isAdmin, setIsAdmin } =
-    useContext(appContext);
+  const { isLogged, setIsLogged, user, setUser } = useContext(appContext);
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [registerData, setRegisterData] = useState({
     email: "",
@@ -58,12 +65,9 @@ const Navbar = () => {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log("login data", data);
         setIsLogged(true);
-        console.log("isLogged", isLogged);
-        const { admin } = data;
-        setIsAdmin(admin);
-        console.log("admin", admin);
+        const { admin, fullName, email, member } = data;
+        setUser({ fullName, email, member, admin });
         navigate("/dashboard");
       })
       .catch((err) => {
@@ -82,8 +86,8 @@ const Navbar = () => {
       body: JSON.stringify(data),
     })
       .then((res) => res.json())
-      .then((data) => {
-        navigate("/dashboard");
+      .then(() => {
+        navigate("/");
       })
       .catch((err) => {
         console.log(err);
@@ -91,10 +95,8 @@ const Navbar = () => {
   };
 
   const handleSecretPassSubmit = (e) => {
-    console.log("submitting");
     e.preventDefault();
     const data = { secret_pass };
-    console.log(data);
     fetch("http://localhost:3000/member", {
       method: "PATCH",
       headers: {
@@ -104,8 +106,7 @@ const Navbar = () => {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log(data);
-        setIsMember(true);
+        setUser({ ...user, member: true });
       })
       .catch((err) => {
         console.log(err);
@@ -113,7 +114,6 @@ const Navbar = () => {
   };
 
   const handleLogoutSubmit = (e) => {
-    console.log("Logging out...");
     e.preventDefault();
     fetch("http://localhost:3000/logout", {
       method: "POST",
@@ -124,10 +124,7 @@ const Navbar = () => {
     })
       .then((res) => res.json())
       .then(() => {
-        console.log(isLogged);
-        console.log("success logout");
         setIsLogged(false);
-        console.log(isLogged);
         navigate("/");
       })
       .catch((err) => {
@@ -136,166 +133,172 @@ const Navbar = () => {
   };
 
   return (
-    <nav>
-      {!isLogged && (
-        <>
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="outline">Login</Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>Login</DialogTitle>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="email" className="text-right">
-                    Email
-                  </Label>
-                  <Input
-                    id="email"
-                    value={loginData.email}
-                    className="col-span-3"
-                    onChange={handleInputChange}
-                  />
+    <nav className="flex items-center justify-between bg-slate-950 py-3 ">
+      <div className="pl-5">
+        <h1 className="text-white font-bold text-lg">
+          Members<span className="text-sky-400">Only</span>
+        </h1>
+      </div>
+      <div className="pr-2 flex gap-3">
+        {!isLogged && (
+          <>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline">Login</Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>Login</DialogTitle>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="email" className="text-right">
+                      Email
+                    </Label>
+                    <Input
+                      id="email"
+                      value={loginData.email}
+                      className="col-span-3"
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="password" className="text-right">
+                      Password
+                    </Label>
+                    <Input
+                      id="password"
+                      value={loginData.password}
+                      className="col-span-3"
+                      onChange={handleInputChange}
+                    />
+                  </div>
                 </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="password" className="text-right">
-                    Password
-                  </Label>
-                  <Input
-                    id="password"
-                    value={loginData.password}
-                    className="col-span-3"
-                    onChange={handleInputChange}
-                  />
-                </div>
-              </div>
-              <DialogFooter>
-                <Button type="submit" onClick={handleLoginSubmit}>
-                  Login
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+                <DialogFooter>
+                  <Button type="submit" onClick={handleLoginSubmit}>
+                    Login
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
 
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="outline">Register</Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>Register</DialogTitle>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="email" className="text-right">
-                    First Name
-                  </Label>
-                  <Input
-                    id="first_name"
-                    value={registerData.first_name}
-                    className="col-span-3"
-                    onChange={handleRegistInputChange}
-                    name="first_name"
-                  />
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline">Register</Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>Register</DialogTitle>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="email" className="text-right">
+                      First Name
+                    </Label>
+                    <Input
+                      id="first_name"
+                      value={registerData.first_name}
+                      className="col-span-3"
+                      onChange={handleRegistInputChange}
+                      name="first_name"
+                    />
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="last_name" className="text-right">
+                      Last name
+                    </Label>
+                    <Input
+                      id="last_name"
+                      value={registerData.last_name}
+                      className="col-span-3"
+                      onChange={handleRegistInputChange}
+                    />
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="email" className="text-right">
+                      Email
+                    </Label>
+                    <Input
+                      id="email"
+                      value={registerData.email}
+                      className="col-span-3"
+                      onChange={handleRegistInputChange}
+                    />
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="password" className="text-right">
+                      Password
+                    </Label>
+                    <Input
+                      id="password"
+                      value={registerData.password}
+                      className="col-span-3"
+                      onChange={handleRegistInputChange}
+                    />
+                  </div>
                 </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="last_name" className="text-right">
-                    Last name
-                  </Label>
-                  <Input
-                    id="last_name"
-                    value={registerData.last_name}
-                    className="col-span-3"
-                    onChange={handleRegistInputChange}
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="email" className="text-right">
-                    Email
-                  </Label>
-                  <Input
-                    id="email"
-                    value={registerData.email}
-                    className="col-span-3"
-                    onChange={handleRegistInputChange}
-                  />
-                </div>
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="password" className="text-right">
-                    Password
-                  </Label>
-                  <Input
-                    id="password"
-                    value={registerData.password}
-                    className="col-span-3"
-                    onChange={handleRegistInputChange}
-                  />
-                </div>
-              </div>
-              <DialogFooter>
-                <Button type="submit" onClick={handleRegisterSubmit}>
-                  Register
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        </>
-      )}
+                <DialogFooter>
+                  <Button type="submit" onClick={handleRegisterSubmit}>
+                    Register
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </>
+        )}
 
-      {isLogged && !isAdmin && !isMember && (
-        <>
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="outline">join Club</Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>Join Club</DialogTitle>
-              </DialogHeader>
-              <div className="grid gap-4 py-4">
-                <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="secret_pass" className="text-right">
-                    Secret Pass
-                  </Label>
-                  <Input
-                    id="secret_pass"
-                    value={secret_pass}
-                    className="col-span-3"
-                    onChange={handleSecretPassChange}
-                  />
+        {isLogged && !user.admin && !user.member && (
+          <>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline">join Club</Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>Join Club</DialogTitle>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="secret_pass" className="text-right">
+                      Secret Pass
+                    </Label>
+                    <Input
+                      id="secret_pass"
+                      value={secret_pass}
+                      className="col-span-3"
+                      onChange={handleSecretPassChange}
+                    />
+                  </div>
                 </div>
-              </div>
-              <DialogFooter>
-                <Button type="submit" onClick={handleSecretPassSubmit}>
-                  Login
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        </>
-      )}
+                <DialogFooter>
+                  <Button type="submit" onClick={handleSecretPassSubmit}>
+                    Login
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </>
+        )}
 
-      {isLogged && (
-        <>
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="outline">Logout</Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>Logout</DialogTitle>
-              </DialogHeader>
-              <DialogFooter>
-                <Button type="submit" onClick={handleLogoutSubmit}>
-                  Logout
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-        </>
-      )}
+        {isLogged && (
+          <>
+            <Menubar>
+              <MenubarMenu>
+                <MenubarTrigger>Acount</MenubarTrigger>
+                <MenubarContent>
+                  <MenubarItem>{`full Name: ${user.fullName}`}</MenubarItem>
+                  <MenubarItem>{`Email: ${user.email}`} </MenubarItem>
+                  <MenubarItem>
+                    {`Member: ${user.member.toString()}`}{" "}
+                  </MenubarItem>
+                  <MenubarSeparator />
+                  <MenubarItem onClick={handleLogoutSubmit}>Logout</MenubarItem>
+                </MenubarContent>
+              </MenubarMenu>
+            </Menubar>
+          </>
+        )}
+      </div>
     </nav>
   );
 };
