@@ -5,18 +5,13 @@ require("dotenv").config();
 //Post routes
 
 const register_user = async (req, res, next) => {
-  const { first_name, last_name, email, password, admin, adminPass } = req.body;
+  const { first_name, last_name, email, password, adminPass } = req.body;
   const adminChecked = ValidateAdminRegistration(adminPass);
   console.log("check admin", adminChecked);
-  //if the user is admin with wrong password
-  if (admin === "true" && adminChecked === false) {
-    const error = new Error("failed to register as an Admin wrong password");
-    next(error);
-  }
-  //if the user is admin with correct password
-  else if (admin === "true" && adminChecked === true) {
+  if (adminChecked === true) {
+    console.log("admin user function");
     const { salt, hash } = genPassword(password);
-    const newUser = new User({ first_name, last_name, email, salt, hash, admin, member: true });
+    const newUser = new User({ first_name, last_name, email, salt, hash, admin: true, member: true });
     newUser
       .save()
       .then((newUser) => {
@@ -25,12 +20,9 @@ const register_user = async (req, res, next) => {
       .catch((error) => {
         next(error);
       });
-  }
-  //if user is not admin (regular user)
-  else {
+  } else if (adminChecked === false && adminPass === "") {
     const { salt, hash } = genPassword(password);
     const newUser = new User({ first_name, last_name, email, salt, hash, admin: false, member: false });
-
     newUser
       .save()
       .then((newUser) => {
@@ -39,6 +31,9 @@ const register_user = async (req, res, next) => {
       .then((error) => {
         next(error);
       });
+  } else {
+    const error = new Error("failed to register as an Admin wrong password");
+    next(error);
   }
 };
 
