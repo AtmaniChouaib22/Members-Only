@@ -1,6 +1,6 @@
 const passport = require("passport");
 const router = require("express").Router();
-const { register_user, get_user, set_member } = require("../Controllers/UserControllers");
+const { register_user, set_member } = require("../Controllers/UserControllers");
 const { post_msg, get_allmsgs, delete_msg, get_allmsgs_protected } = require("../Controllers/MessageControllers");
 const { isAuth, isAdmin } = require("./authMiddleware");
 
