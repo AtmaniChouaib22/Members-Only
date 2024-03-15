@@ -17,20 +17,25 @@ import {
 } from "@/components/ui/menubar";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { appContext } from "@/App";
+import axios from "axios";
 
 const Navbar = () => {
   const { isLogged, setIsLogged, user, setUser } = useContext(appContext);
   const [loginData, setLoginData] = useState({ email: "", password: "" });
+  const [adminButtonChecked, setAdminButtonChecked] = useState(false);
   const [registerData, setRegisterData] = useState({
     email: "",
     password: "",
     first_name: "",
     last_name: "",
+    adminPass: "",
   });
   const [secret_pass, setSecretPass] = useState("");
+  const [message, setMessage] = useState("");
 
   const navigate = useNavigate();
 
@@ -52,6 +57,14 @@ const Navbar = () => {
     setSecretPass(event.target.value);
   };
 
+  const handleMessageChange = (event) => {
+    setMessage(event.target.value);
+  };
+
+  const handleAdminButtonChange = () => {
+    setAdminButtonChecked(!adminButtonChecked);
+  };
+
   const handleLoginSubmit = (e) => {
     e.preventDefault();
     const data = loginData;
@@ -68,6 +81,8 @@ const Navbar = () => {
         setIsLogged(true);
         const { admin, fullName, email, member } = data;
         setUser({ fullName, email, member, admin });
+        setLoginData({ email: "", password: "" });
+        setAdminButtonChecked(false);
         navigate("/dashboard");
       })
       .catch((err) => {
@@ -87,6 +102,14 @@ const Navbar = () => {
     })
       .then((res) => res.json())
       .then(() => {
+        setRegisterData({
+          email: "",
+          password: "",
+          first_name: "",
+          last_name: "",
+          adminPass: "",
+        });
+        setAdminButtonChecked(false);
         navigate("/");
       })
       .catch((err) => {
@@ -129,6 +152,19 @@ const Navbar = () => {
       })
       .catch((err) => {
         console.log(err);
+      });
+  };
+
+  const handleMessageSubmit = (e) => {
+    e.preventDefault();
+    axios
+      .post(
+        "http://localhost:3000/newpost",
+        { message },
+        { withCredentials: true }
+      )
+      .then((res) => {
+        console.log(res);
       });
   };
 
@@ -236,6 +272,23 @@ const Navbar = () => {
                       onChange={handleRegistInputChange}
                     />
                   </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox id="admin" onClick={handleAdminButtonChange} />
+                    <label
+                      htmlFor="admin"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      Register as an admin
+                    </label>
+                    {adminButtonChecked && (
+                      <Input
+                        id="adminPass"
+                        className="col-span-3"
+                        onChange={handleRegistInputChange}
+                        value={registerData.adminPass}
+                      />
+                    )}
+                  </div>
                 </div>
                 <DialogFooter>
                   <Button type="submit" onClick={handleRegisterSubmit}>
@@ -273,6 +326,39 @@ const Navbar = () => {
                 <DialogFooter>
                   <Button type="submit" onClick={handleSecretPassSubmit}>
                     Login
+                  </Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </>
+        )}
+
+        {isLogged && (user.admin || user.member) && (
+          <>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline">New Message</Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>New Message</DialogTitle>
+                </DialogHeader>
+                <div className="grid gap-4 py-4">
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="message" className="text-right">
+                      Message
+                    </Label>
+                    <Input
+                      id="message"
+                      value={message}
+                      className="col-span-3"
+                      onChange={handleMessageChange}
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button type="submit" onClick={handleMessageSubmit}>
+                    Send
                   </Button>
                 </DialogFooter>
               </DialogContent>
