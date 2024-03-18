@@ -24,7 +24,8 @@ import { appContext } from "@/App";
 import axios from "axios";
 
 const Navbar = () => {
-  const { isLogged, setIsLogged, user, setUser } = useContext(appContext);
+  const { isLogged, setIsLogged, user, setUser, loading, setLoading } =
+    useContext(appContext);
   const [loginData, setLoginData] = useState({ email: "", password: "" });
   const [adminButtonChecked, setAdminButtonChecked] = useState(false);
   const [registerData, setRegisterData] = useState({
@@ -66,6 +67,7 @@ const Navbar = () => {
   };
 
   const handleLoginSubmit = (e) => {
+    setLoading(true);
     e.preventDefault();
     const data = loginData;
     fetch("http://localhost:3000/login", {
@@ -83,6 +85,9 @@ const Navbar = () => {
         setUser({ fullName, email, member, admin });
         setLoginData({ email: "", password: "" });
         setAdminButtonChecked(false);
+      })
+      .finally(() => {
+        setLoading(false);
         navigate("/dashboard");
       })
       .catch((err) => {
@@ -122,13 +127,14 @@ const Navbar = () => {
     const data = { secret_pass };
     fetch("http://localhost:3000/member", {
       method: "PATCH",
+      credentials: "include",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
     })
       .then((res) => res.json())
-      .then((data) => {
+      .then(() => {
         setUser({ ...user, member: true });
       })
       .catch((err) => {
@@ -164,7 +170,7 @@ const Navbar = () => {
         { withCredentials: true }
       )
       .then((res) => {
-        console.log(res);
+        setMessage("");
       });
   };
 
@@ -196,6 +202,7 @@ const Navbar = () => {
                       value={loginData.email}
                       className="col-span-3"
                       onChange={handleInputChange}
+                      placeholder="ex: ryangosling@gmail.com"
                     />
                   </div>
                   <div className="grid grid-cols-4 items-center gap-4">
@@ -207,6 +214,8 @@ const Navbar = () => {
                       value={loginData.password}
                       className="col-span-3"
                       onChange={handleInputChange}
+                      placeholder="ex: password1234"
+                      type="password"
                     />
                   </div>
                 </div>
@@ -217,7 +226,6 @@ const Navbar = () => {
                 </DialogFooter>
               </DialogContent>
             </Dialog>
-
             <Dialog>
               <DialogTrigger asChild>
                 <Button variant="outline">Register</Button>
@@ -237,6 +245,7 @@ const Navbar = () => {
                       className="col-span-3"
                       onChange={handleRegistInputChange}
                       name="first_name"
+                      placeholder="ex: Ryan"
                     />
                   </div>
                   <div className="grid grid-cols-4 items-center gap-4">
@@ -248,6 +257,7 @@ const Navbar = () => {
                       value={registerData.last_name}
                       className="col-span-3"
                       onChange={handleRegistInputChange}
+                      placeholder="ex: Gosling"
                     />
                   </div>
                   <div className="grid grid-cols-4 items-center gap-4">
@@ -259,6 +269,7 @@ const Navbar = () => {
                       value={registerData.email}
                       className="col-span-3"
                       onChange={handleRegistInputChange}
+                      placeholder="ex: ryangosling@gmail.com"
                     />
                   </div>
                   <div className="grid grid-cols-4 items-center gap-4">
@@ -270,6 +281,8 @@ const Navbar = () => {
                       value={registerData.password}
                       className="col-span-3"
                       onChange={handleRegistInputChange}
+                      placeholder="ex: password1234"
+                      type="password"
                     />
                   </div>
                   <div className="flex items-center space-x-2">
@@ -286,6 +299,7 @@ const Navbar = () => {
                         className="col-span-3"
                         onChange={handleRegistInputChange}
                         value={registerData.adminPass}
+                        placeholder="Admin Pass required"
                       />
                     )}
                   </div>
@@ -313,13 +327,14 @@ const Navbar = () => {
                 <div className="grid gap-4 py-4">
                   <div className="grid grid-cols-4 items-center gap-4">
                     <Label htmlFor="secret_pass" className="text-right">
-                      Secret Pass
+                      Club Password
                     </Label>
                     <Input
                       id="secret_pass"
                       value={secret_pass}
                       className="col-span-3"
                       onChange={handleSecretPassChange}
+                      placeholder="ex: clubpassword1234"
                     />
                   </div>
                 </div>
@@ -353,6 +368,7 @@ const Navbar = () => {
                       value={message}
                       className="col-span-3"
                       onChange={handleMessageChange}
+                      placeholder="ex: Hello World!"
                     />
                   </div>
                 </div>
@@ -378,7 +394,9 @@ const Navbar = () => {
                     {`Member: ${user.member.toString()}`}{" "}
                   </MenubarItem>
                   <MenubarSeparator />
-                  <MenubarItem onClick={handleLogoutSubmit}>Logout</MenubarItem>
+                  <MenubarItem onClick={handleLogoutSubmit}>
+                    <Button variant={"destructive"}>Logout</Button>
+                  </MenubarItem>
                 </MenubarContent>
               </MenubarMenu>
             </Menubar>

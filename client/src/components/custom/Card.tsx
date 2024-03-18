@@ -11,7 +11,7 @@ const Card = ({ message, fullName, id, createdAt, admin, user }) => {
     >
       <div>{message}</div>
       {(user.member === true || user.admin === true) && isLogged ? (
-        <div className="flex gap-2">
+        <div className="sm:flex sm:gap-2 flex flex-col flex-wrap">
           <div>
             By <span className="font-bold pr-1">{fullName}</span>
             {admin && <Badge>Admin</Badge>}
@@ -23,7 +23,7 @@ const Card = ({ message, fullName, id, createdAt, admin, user }) => {
       ) : (
         <>
           <hr />
-          <div>Join the club to view this</div>
+          <div className="font-bold">Join the club to view details</div>
         </>
       )}
     </div>

@@ -13,12 +13,15 @@ export const appContext = createContext({
   setIsAdmin: (isAdmin: boolean) => {},
   user: {},
   setUser: (user: object) => {},
+  loading: false,
+  setLoading: (loading: boolean) => {},
 });
 
 function App() {
   const [isLogged, setIsLogged] = useState(false);
   const [isMember, setIsMember] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [user, setUser] = useState({
     fullName: "",
     admin: false,
@@ -36,6 +39,8 @@ function App() {
         setIsAdmin,
         user,
         setUser,
+        loading,
+        setLoading,
       }}
     >
       <BrowserRouter>
