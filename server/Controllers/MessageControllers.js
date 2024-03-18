@@ -13,6 +13,8 @@ function messageAbility(user) {
 //post a message
 async function post_msg(req, res) {
   const { message } = req.body;
+  console.log(req.session);
+  console.log(req.user);
   const sender = req.user.id;
   const user = await User.findById(sender).select("first_name last_name admin member");
   const msgAbility = messageAbility(user);
