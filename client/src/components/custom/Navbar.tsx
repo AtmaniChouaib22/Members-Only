@@ -18,6 +18,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import FadeLoader from "react-spinners/FadeLoader";
 import { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { appContext } from "@/App";
@@ -80,6 +81,7 @@ const Navbar = () => {
     })
       .then((res) => res.json())
       .then((data) => {
+        setLoading(true);
         setIsLogged(true);
         const { admin, fullName, email, member } = data;
         setUser({ fullName, email, member, admin });
@@ -96,6 +98,7 @@ const Navbar = () => {
   };
 
   const handleRegisterSubmit = (e) => {
+    setLoading(true);
     e.preventDefault();
     const data = registerData;
     fetch("http://localhost:3000/register", {
@@ -115,6 +118,7 @@ const Navbar = () => {
           adminPass: "",
         });
         setAdminButtonChecked(false);
+        setLoading(false);
         navigate("/");
       })
       .catch((err) => {
@@ -123,6 +127,7 @@ const Navbar = () => {
   };
 
   const handleSecretPassSubmit = (e) => {
+    setLoading(true);
     e.preventDefault();
     const data = { secret_pass };
     fetch("http://localhost:3000/member", {
@@ -136,6 +141,7 @@ const Navbar = () => {
       .then((res) => res.json())
       .then(() => {
         setUser({ ...user, member: true });
+        setLoading(false);
       })
       .catch((err) => {
         console.log(err);
@@ -143,6 +149,7 @@ const Navbar = () => {
   };
 
   const handleLogoutSubmit = (e) => {
+    setLoading(true);
     e.preventDefault();
     fetch("http://localhost:3000/logout", {
       method: "POST",
@@ -154,6 +161,7 @@ const Navbar = () => {
       .then((res) => res.json())
       .then(() => {
         setIsLogged(false);
+        setLoading(false);
         navigate("/");
       })
       .catch((err) => {
@@ -162,6 +170,7 @@ const Navbar = () => {
   };
 
   const handleMessageSubmit = (e) => {
+    setLoading(true);
     e.preventDefault();
     axios
       .post(
@@ -171,7 +180,8 @@ const Navbar = () => {
       )
       .then((res) => {
         setMessage("");
-      });
+      })
+      .finally(() => setLoading(false));
   };
 
   return (
@@ -220,9 +230,13 @@ const Navbar = () => {
                   </div>
                 </div>
                 <DialogFooter>
-                  <Button type="submit" onClick={handleLoginSubmit}>
-                    Login
-                  </Button>
+                  {loading ? (
+                    <FadeLoader />
+                  ) : (
+                    <Button type="submit" onClick={handleLoginSubmit}>
+                      Login
+                    </Button>
+                  )}
                 </DialogFooter>
               </DialogContent>
             </Dialog>
@@ -283,6 +297,7 @@ const Navbar = () => {
                       onChange={handleRegistInputChange}
                       placeholder="ex: password1234"
                       type="password"
+                      required
                     />
                   </div>
                   <div className="flex items-center space-x-2">
@@ -305,9 +320,13 @@ const Navbar = () => {
                   </div>
                 </div>
                 <DialogFooter>
-                  <Button type="submit" onClick={handleRegisterSubmit}>
-                    Register
-                  </Button>
+                  {loading ? (
+                    <FadeLoader />
+                  ) : (
+                    <Button type="submit" onClick={handleRegisterSubmit}>
+                      Register
+                    </Button>
+                  )}
                 </DialogFooter>
               </DialogContent>
             </Dialog>
@@ -339,9 +358,13 @@ const Navbar = () => {
                   </div>
                 </div>
                 <DialogFooter>
-                  <Button type="submit" onClick={handleSecretPassSubmit}>
-                    Login
-                  </Button>
+                  {loading ? (
+                    <FadeLoader />
+                  ) : (
+                    <Button type="submit" onClick={handleSecretPassSubmit}>
+                      join
+                    </Button>
+                  )}
                 </DialogFooter>
               </DialogContent>
             </Dialog>
@@ -373,9 +396,13 @@ const Navbar = () => {
                   </div>
                 </div>
                 <DialogFooter>
-                  <Button type="submit" onClick={handleMessageSubmit}>
-                    Send
-                  </Button>
+                  {loading ? (
+                    <FadeLoader />
+                  ) : (
+                    <Button type="submit" onClick={handleMessageSubmit}>
+                      Send
+                    </Button>
+                  )}
                 </DialogFooter>
               </DialogContent>
             </Dialog>
@@ -395,7 +422,11 @@ const Navbar = () => {
                   </MenubarItem>
                   <MenubarSeparator />
                   <MenubarItem onClick={handleLogoutSubmit}>
-                    <Button variant={"destructive"}>Logout</Button>
+                    {loading ? (
+                      <FadeLoader />
+                    ) : (
+                      <Button variant={"destructive"}>Logout</Button>
+                    )}
                   </MenubarItem>
                 </MenubarContent>
               </MenubarMenu>
