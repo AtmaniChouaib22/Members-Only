@@ -26,6 +26,7 @@ const Dashboard = () => {
         ) : (
           messages.map((message) => (
             <Card
+              id={message._id}
               key={message._id}
               message={message.message}
               fullName={message.user.fullName}

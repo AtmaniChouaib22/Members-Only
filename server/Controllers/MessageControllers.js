@@ -11,10 +11,8 @@ function messageAbility(user) {
 }
 
 //post a message
-async function post_msg(req, res) {
+async function post_msg(req, res, next) {
   const { message } = req.body;
-  console.log(req.session);
-  console.log(req.user);
   const sender = req.user.id;
   const user = await User.findById(sender).select("first_name last_name admin member");
   const msgAbility = messageAbility(user);
@@ -35,7 +33,7 @@ async function post_msg(req, res) {
 }
 
 //get all messages
-function get_allmsgs(req, res) {
+function get_allmsgs(req, res, next) {
   messages
     .find()
     .then((allmsgs) => {
@@ -46,7 +44,7 @@ function get_allmsgs(req, res) {
     });
 }
 
-function get_allmsgs_protected(req, res) {
+function get_allmsgs_protected(req, res, next) {
   messages
     .find()
     .populate("user", "first_name last_name username createdAt admin member")
@@ -58,8 +56,9 @@ function get_allmsgs_protected(req, res) {
     });
 }
 //delete a message
-function delete_msg(req, res) {
+function delete_msg(req, res, next) {
   const { id } = req.params;
+  console.log("message id", id);
   messages
     .findByIdAndDelete(id)
     .then((deleted) => {
