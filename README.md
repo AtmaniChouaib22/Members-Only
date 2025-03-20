@@ -11,6 +11,8 @@ A simple web application built using the MERN stack that allows authenticated us
 -   **Unauthenticated users** can only view messages without sender details
     
 -   Uses **MongoDB with Mongoose** for database management
+  
+-   Uses **Express-session** for session management
     
 
 ## Technologies Used
